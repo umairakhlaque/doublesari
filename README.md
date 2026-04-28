@@ -4,13 +4,45 @@ A real-time, server-authoritative implementation of **Double Sar / Rang / Court 
 
 ---
 
-## Quick Start
+## Play Over the Internet
 
-### Prerequisites
-- Node.js 18+
-- npm 9+
+### Option A — GitHub Codespaces (fastest, no extra accounts)
 
-### Install & Run (Development)
+> Works in about 2 minutes. Share one URL with your friends.
+
+1. Open this repo on GitHub.
+2. Click **Code → Codespaces → Create codespace on `main`** (or the feature branch).
+3. The devcontainer installs everything and starts both servers automatically.
+4. In the **Ports** panel (bottom of VS Code), find port **5173** — click **Make Public**, then copy the URL.
+5. Share that URL with up to 3 friends — you can all play in your browsers.
+
+The start script auto-detects the Codespaces forwarded URLs and writes the correct env vars so the frontend talks to the backend seamlessly.
+
+---
+
+### Option B — Persistent Public Hosting (Render + Vercel, free tier)
+
+**Deploy backend to Render:**
+
+1. Push this repo to GitHub.
+2. Go to [render.com](https://render.com) → **New → Blueprint**.
+3. Connect your repo — Render reads `render.yaml` automatically.
+4. After deploy, note your backend URL e.g. `https://doublesari-backend.onrender.com`.
+5. In Render dashboard → Environment → set `CLIENT_URL` to your Vercel frontend URL (see below).
+
+**Deploy frontend to Vercel:**
+
+1. Go to [vercel.com](https://vercel.com) → **Add New Project** → import this repo.
+2. Set **Root Directory** to `frontend`.
+3. Add environment variable: `VITE_SERVER_URL` = your Render backend URL.
+4. Deploy. Copy the Vercel URL.
+5. Go back to Render and set `CLIENT_URL` to your Vercel URL, then redeploy.
+
+After both are deployed, share the Vercel URL — anyone can open it and play.
+
+---
+
+### Option C — Local Development
 
 ```bash
 # Install all dependencies
