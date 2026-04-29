@@ -339,12 +339,13 @@ function joinRoom(socket: Socket, session: RoomSession, displayName: string): vo
     playerId: socket.id, displayName, seat, team: player.team,
   });
 
+  // Fill bots before checking if ready — so one human can start instantly
+  fillBotsIfNeeded(session);
+
   if (engine.isReadyToStart()) {
     room.state = 'IN_PROGRESS';
-    fillBotsIfNeeded(session);
     engine.startMatch();
-    broadcastToRoom(socket.broadcast.to(room.id) as any, session, 'match_started', {});
-    socket.emit('match_started', {});
+    if (_io) _io.to(room.id).emit('match_started', {});
     broadcastGameState(session);
     scheduleInitialBotTurns(session);
   }
