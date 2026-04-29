@@ -1,12 +1,3 @@
-# Render Blueprint — deploys the backend as a persistent web service.
-# https://render.com/docs/blueprint-spec
-#
-# Deploy steps:
-#   1. Push this repo to GitHub.
-#   2. Go to https://dashboard.render.com → New → Blueprint.
-#   3. Connect your repo. Render reads this file automatically.
-#   4. Set CLIENT_URL to your Vercel/Netlify frontend URL after deploying frontend.
-
 services:
   - type: web
     name: doublesari-backend
@@ -14,18 +5,15 @@ services:
     region: oregon
     plan: free
     rootDir: backend
-    # --include=dev ensures TypeScript is installed even when NODE_ENV=production
     buildCommand: npm install --include=dev && npm run build
-    startCommand: node dist/server.js
+    startCommand: npm start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
-      # Set CLIENT_URL to your deployed frontend URL, e.g.:
-      #   https://doublesari.vercel.app
-      # You can also add a wildcard:
-      #   https://doublesari.vercel.app,https://*.vercel.app
+      # Render injects PORT automatically — do not override it here.
+      # Set CLIENT_URL to your Vercel frontend URL once it is deployed,
+      # e.g. https://doublesari.vercel.app
+      # Use * to allow all origins temporarily.
       - key: CLIENT_URL
-        sync: false   # fill this in Render dashboard after deploying frontend
+        value: "*"
