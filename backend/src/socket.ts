@@ -114,7 +114,7 @@ export function registerSocketHandlers(io: SocketServer): void {
         broadcastToRoom(io, session, 'trump_selected', {
           suit: data.suit, callerId: playerId,
         });
-        broadcastGameState(io, session);
+        broadcastGameState(session);
         scheduleBotTurn(io, session);
       } catch (e: any) {
         socket.emit('error_message', { message: e.message });
@@ -183,7 +183,7 @@ export function registerSocketHandlers(io: SocketServer): void {
           }
         }
 
-        broadcastGameState(io, session);
+        broadcastGameState(session);
         if (!result.handComplete) scheduleBotTurn(io, session);
       } catch (e: any) {
         logAntiCheatEvent(
@@ -259,7 +259,7 @@ export function registerSocketHandlers(io: SocketServer): void {
 
       engine.handleDisconnect(playerId);
       broadcastToRoom(io, session, 'player_disconnected', { playerId });
-      broadcastGameState(io, session);
+      broadcastGameState(session);
 
       // Bot takeover timer
       const timer = setTimeout(() => {
@@ -345,9 +345,7 @@ function joinRoom(socket: Socket, session: RoomSession, displayName: string): vo
     engine.startMatch();
     broadcastToRoom(socket.broadcast.to(room.id) as any, session, 'match_started', {});
     socket.emit('match_started', {});
-    broadcastGameState({ to: () => ({ emit: () => {} }) } as any, session);
-    // We need io ref — handled via the broadcast below
-    broadcastGameStateViaSession(session);
+    broadcastGameState(session);
     scheduleInitialBotTurns(session);
   }
 }
@@ -373,18 +371,13 @@ function broadcastToRoom(
   io.to(session.room.id).emit(event, data);
 }
 
-// Broadcasts full per-player game state to each connected player
-function broadcastGameStateViaSession(session: RoomSession): void {
-  // Accessed via the module-level `io` reference — handled in the next fn
-}
-
 let _io: SocketServer | null = null;
 
 export function setIO(io: SocketServer): void {
   _io = io;
 }
 
-function broadcastGameState(_io2: any, session: RoomSession): void {
+function broadcastGameState(session: RoomSession): void {
   if (!_io) return;
   for (const [playerId, socketId] of session.playerSocketMap.entries()) {
     const player = session.engine.state.players[playerId];
@@ -408,7 +401,7 @@ function scheduleBotTurn(io: SocketServer, session: RoomSession): void {
         const suit = bot.decideTrump(currentPlayerId);
         engine.selectTrump(currentPlayerId, suit);
         broadcastToRoom(io, session, 'trump_selected', { suit, callerId: currentPlayerId });
-        broadcastGameState(io, session);
+        broadcastGameState(session);
         scheduleBotTurn(io, session);
         return;
       }
@@ -458,16 +451,16 @@ function scheduleBotTurn(io: SocketServer, session: RoomSession): void {
               setTimeout(() => {
                 engine.startNextHand();
                 broadcastToRoom(io, session, 'match_started', {});
-                broadcastGameState(io, session);
+                broadcastGameState(session);
                 scheduleBotTurn(io, session);
               }, 3000);
-              broadcastGameState(io, session);
+              broadcastGameState(session);
               return;
             }
           }
         }
 
-        broadcastGameState(io, session);
+        broadcastGameState(session);
         scheduleBotTurn(io, session);
       }
     } catch (e) {
