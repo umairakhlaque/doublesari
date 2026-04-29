@@ -14,7 +14,8 @@ services:
     region: oregon
     plan: free
     rootDir: backend
-    buildCommand: npm install && npm run build
+    # --include=dev ensures TypeScript is installed even when NODE_ENV=production
+    buildCommand: npm install --include=dev && npm run build
     startCommand: node dist/server.js
     healthCheckPath: /health
     envVars:
