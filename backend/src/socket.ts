@@ -176,7 +176,7 @@ export function registerSocketHandlers(io: SocketServer): void {
               setTimeout(() => {
                 engine.startNextHand();
                 broadcastToRoom(io, session!, 'match_started', {});
-                broadcastGameState(io, session!);
+                broadcastGameState(session!);
                 scheduleBotTurn(io, session!);
               }, 3000);
             }
